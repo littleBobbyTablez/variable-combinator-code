@@ -1,0 +1,52 @@
+{
+  "altersGruppen": [
+    "alle",
+    "15-29",
+    "30-49",
+    "50+"
+  ],
+  "branchen": [
+    "alle",
+    "Branche1",
+    "Branche2"
+  ],
+  "geschlechter": [
+    "alle",
+    "m",
+    "w",
+    "d"
+  ],
+  "groessen": [
+    "alle",
+    "1 Bis 9",
+    "10 bis 100",
+    "100+"
+  ],
+  "header": [
+    "Jahre",
+    "Branchen",
+    "Groessen",
+    "Qualifikationen",
+    "Geschlechter",
+    "AltersGruppen",
+    "Sebstbestimmung",
+    "Anteil"
+  ],
+  "jahre": [
+    "2008",
+    "2012",
+    "2018"
+  ],
+  "qualis": [
+    "alle",
+    "Abi",
+    "Ausbildung",
+    "Keine"
+  ],
+  "sebstbestimmung": [
+    "haeufig",
+    "manchmal",
+    "selten",
+    "nie"
+  ]
+}
