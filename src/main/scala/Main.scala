@@ -1,56 +1,37 @@
 import java.io.{File, FileWriter}
-import java.util
 
-import Main.Line
-import cats.effect.IO
-import com.typesafe.config.{Config, ConfigFactory, ConfigList}
-import io.chrisdavenport.cormorant.Printer
-import io.chrisdavenport.log4cats.Logger
+import com.typesafe.config.{Config, ConfigFactory}
 
 object Main extends App {
 
-  import io.chrisdavenport.cormorant._
-  import io.chrisdavenport.cormorant.generic.semiauto._
-  import io.chrisdavenport.cormorant.implicits._
-  import scala.jdk.CollectionConverters._
+  val path: Config = ConfigFactory.parseFile(new File("./application.conf"))
 
-  val conf: Config = ConfigFactory.parseFile(new File("./application.conf"))
+  val bufferedSource = scala.io.Source.fromFile(s"./${path.getString("filename")}")
+  val input = bufferedSource.getLines().toList.map(_.split(",").toList)
 
-  case class Line(jahr: String, branche: String, firmengroesse: String, quali: String, geschlecht: String, alter: String, selbstbestimmt: String)
-
-  implicit val sopr: Read[Line] = deriveRead
-  implicit val vwr: Write[Line] = deriveWrite
-
-  def writeDataToCsv(lines: List[Line]): Unit = {
+  def writeDataToCsv(lines: List[String], header: String): Unit = {
     val writer = new FileWriter(s"./lines.csv")
-    writer.write(header.mkString(",") + "\n")
-    writer.append(lines.writeRows.print(Printer.default))
+    writer.write(header + "\n")
+    lines.foreach(l => writer.write(l + "\n"))
     writer.close()
   }
 
-  val header = conf.getStringList("header").asScala.toList
-  val jahre = conf.getStringList("jahre").asScala.toList
-  val branchen = conf.getStringList("branchen").asScala.toList
-  val groessen = conf.getStringList("groessen").asScala.toList
-  val qualis = conf.getStringList("qualis").asScala.toList
-  val geschlechter = conf.getStringList("geschlechter").asScala.toList
-  val altersGruppen = conf.getStringList("altersGruppen").asScala.toList
-  val sebstbestimmung = conf.getStringList("sebstbestimmung").asScala.toList
+  def crossJoin[T](list: Iterable[Iterable[T]]): Iterable[Iterable[T]] =
+    list match {
+      case xs :: Nil => xs map (Iterable(_))
+      case x :: xs => for {
+        i <- x
+        j <- crossJoin(xs)
+      } yield Iterable(i) ++ j
+    }
 
 
-  val lines = jahre.flatMap(j =>
-    branchen.flatMap(b =>
-      groessen.flatMap(gr =>
-        qualis.flatMap(q =>
-          geschlechter.flatMap(ge =>
-            altersGruppen.flatMap(a =>
-              sebstbestimmung.map(s => Line(j, b, gr, q, ge, a, s)))
-          )
-        )
-      )
-    )
-  )
+  val header = input.map(_.head)
+  val noHeaders = input.map(_.tail)
 
-  writeDataToCsv(lines)
+  private val lines: List[List[String]] = crossJoin(noHeaders).toList.map(_.toList)
+
+  writeDataToCsv(lines.toList.map(x => x.mkString(",")).toList,
+    header.mkString(","))
 }
 
