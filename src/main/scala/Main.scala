@@ -27,7 +27,7 @@ object Main extends App {
 
 
   val header = input.map(_.head)
-  val noHeaders = input.map(_.tail)
+  val noHeaders = input.map(_.tail).filter(_.nonEmpty)
 
   private val lines: List[List[String]] = crossJoin(noHeaders).toList.map(_.toList)
 

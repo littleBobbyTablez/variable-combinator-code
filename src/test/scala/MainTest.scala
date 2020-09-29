@@ -13,8 +13,10 @@ class MainTest extends AnyFlatSpec {
 //    val buchstaben = List("A", "B", "C")
 //    val zahlen = List("1", "2", "3", "4")
 //    val zeichen = List(".",",","|")
-//    val input = List(buchstaben, zahlen, zeichen)
-
+//    val empty = List.empty
+//    val inputW = List(buchstaben, zahlen, zeichen, empty)
+//
+//    val input: List[List[String]] = inputW.filter(_.isEmpty)
 
     val output = Main.crossJoin(input)
 
